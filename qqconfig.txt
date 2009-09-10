@@ -1,0 +1,23 @@
+﻿# 是否记录发送和接收包的信息
+QQPacketLog = true
+# 是否打印控制台调试信息。
+QQTerminalLog = false
+# 日志目录，删除下面一条将不记录日志。
+QQLogDir = ./log
+# 验证码目录
+QQVerifyDir = ./verify
+# 登录方式
+# TCP or UDP or PROXY_HTTP
+QQNetwork = UDP
+# 禁止使用色彩。true表示禁止色彩文字
+NoColor = true
+
+下面为QQ服务器列表，每个服务器用|来隔开，IP和端口用:来给开。
+电信服务器
+#QQTcpServerList = 219.133.60.173:80|219.133.38.232:80|219.133.40.177:80
+最多允许添加16个
+QQTcpServerList = 219.133.60.173:443|219.133.49.125:443|58.60.15.33:443
+QQUdpServerList = 219.133.49.171:8000|58.60.14.37:8000|219.133.60.36:8000|sz6.tencent.com:8000|sz7.tencent.com:8000|sz8.tencent.com:8000|sz9.tencent.com:8000
+
+HTTP代理服务器
+QQHttpProxyServerList = 148.233.239.24:80|148.233.239.23:80|200.65.129.2:80

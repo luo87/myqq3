@@ -1,0 +1,202 @@
+MyQQ is a cross-platform library for communication which uses a TencentQQ-like
+protocol to communicate with friends on the Internet. It can work well now and
+maintained by Xiaoxia (gdxxhg@gmail.com).
+
+If you are interested in MyQQ and have improved it, I suggest you that you send 
+your source code to me then everyone will know your work and thank you!
+
+You can get the latest version of this software (including its source code) at
+http://home.xxsyzx.com
+
+注意：本软件以及源代码仅供学习研究使用。所用协议皆属个人业余的黑匣分析结果。
+
+Developer List:
+小虾 (gdxxhg@gmail.com)
+千月(改进myqq.c界面)
+ccpaging
+
+Windows编译：
+需要Mingw32(Devcpp的bin也可以)。
+打开控制台，在当前目录下执行
+	make -C src clean all
+Linux编译：
+在终端里执行
+	make -C src -flinux.mak clean all
+MacOSX编译：
+在终端里执行
+	make -C src -fmac.mak clean all
+由于最初没有周全考虑，目前版本暂时不兼容64位的机器，望见谅！
+
+Update History:
+
+Version 3.19(2009-9-10)
+1. 修复获取群列表（3.18的登录时跳过了获取群列表）。
+2. 增加获取好友详细资料。
+3. 整理myqq.c中的登录状态判断。
+
+Version 3.18 (2009-7-6 2009-7-30)
+1. 修正config.c潜在的内存溢出。
+2. 支持长消息（长度大于700）文本发送。
+3. libqq异步登录。
+4. myqq显示别名为主。
+5. 修改了登录协议和别名获取协议。
+
+Version 3.17 (2009-6-30)
+1. 修正发送消息后头像的变化。
+2. 修正09SP1接收信息的bug。
+3. 修正0x18包中获取好友失败时的内存访问错误。
+4. 修正09SP1系统消息协议。
+5. 盲目修正09接收消息的bug。
+6. 增加qqconn.c，支持代理登录。
+
+Version 3.16 (2009-6-27)
+1. 增加NoColor配置项关闭色彩文字。
+2. 增加cls/clear/clrscr命令来清屏。
+3. 提示消息发送失败，但不具体。
+
+Version 3.15 (2009-6-24)
+1. 增加qqclient_detach()。
+2. 编写成libqq，供外部程序调用。
+
+Version 3.14 (2009-6-21)
+1. 命令行参数方式登录失败后的死循环。
+2. 内核使用QQ2009SP1协议。
+3. 修正08之前接收消息的bug。
+4. 兼容Mac32。
+5. utf8.c里添加qqdef.h头文件。
+
+Version 3.13 (2009-3-29)
+1. Linux(Ubuntu) version compiled!
+
+Version 3.12 (2009-3-22)
+1. 用Windows的Sleep代替不推荐的_sleep。
+2. 在Mingw32-gcc4.3.3上编译成功。
+
+Version 3.11 (2009-2-8)
+1. 输入验证码提示。
+2. 修正myqq.c删除好友的bug。
+3. 修正添加附言的bug。
+
+Version 3.10 (2009-2-7)
+1. 修正09接收消息协议。
+2. 全部源代码文件更改为UNIX-UTF8格式。
+3. 增加Preference来自定义屏蔽部分协议。
+4. 增加添加、删除好友基本协议，支持验证码。
+5. 登录后更改状态。
+6. 登录机器数据随机填充。
+7. 修正myqq.c里无法打印某些消息的bug。
+
+Version 3.08 (2009-1-27)
+1. 修正myqq.c里显示好友状态。
+2. 修正因缺少pthread_mutex_destroy引起的资源泄漏（可以检测到）。
+3. 修正好友数目多时导致分组信息与群信息未能获取的问题。
+4. 10分钟刷新群在线成员。
+5. 自动建立qqconfig.txt配置文件。
+
+Version 3.03 (2009-1-26)
+1. 修正prot_im.c中buf->pos += get_word( buf );在Linux上运行时发生的错误。
+2. 编译Linux版本。
+3. qqconfig.txt缺失提示。
+
+Version 3.00 (2009-1-25)
+1. 更换QQ2008贺岁版协议为QQ2009Preview4协议。
+2. 全面使用utf8，myqq.c为Windows用户转换为gb。
+3. 移除所有多余，功能不确切的协议处理函数。
+4. 能够接收08，09协议的好友消息与群消息。
+5. 处理消息中的表情字符，转换成[face:*]以及[image]来表示。
+
+Version 2.95 (2008-10-26)
+1. 处理返回NULL的可能。
+2. 服务器列表由配置文件导入。
+
+Version 2.9 (2008-10-1)
+1. 支持字符颜色显示。
+2. 中文字符界面。
+3. 补充了几个新的服务器IP。
+4. 输入密码时去掉回显或打*。
+5. 修正prot_login_verify_password_reply处理返回包的误解，感谢CC-Akita(CCPaging)。
+6. 增加Dev-cpp工程文件，增加程序图标。
+7. Makefile里定向pthread库，便于不同环境的编译。
+
+Version 2.8 (2008-8-3)
+1. Linux Build Support.
+
+Version 2.7 (2008-8-2)
+1. 使用上次登录IP，加快多Q登录速度。
+2. 修正list.c里添加项在满时没有返回<0的漏洞。
+3. 在登录未完成时，不接收消息。
+
+Version 2.6 (2008-7-27)
+1. 登录中的未知字节用0填充，原来是用随机数。
+2. 根据文档，进一步完善登录协议，但还是没有解决验证码的出现问题。
+
+Version 2.5 (2008-7-26)
+1. 修正一个发包的bug，包被送进已发送队列之后time_alive应该为当前时间。之前因为
+这个问题，导致一个包超时其他包也要重发？
+2. 恢复注销命令（没有这个，怎么下线呢）。
+3. 登录首先获取所有钥匙，避免出现登录后被Kick out。
+4. 感谢网友008的提醒，号码格式化字符%d已被替换为%u。
+
+Version 2.4 (2008-7-24)
+1. 好友添加。
+2. Packed with pthread library.
+3. 删除注销命令（可能引发异常）
+4. 重发时长为6秒
+
+Version 2.3 (2008-7-22)
+New features:
+1. 支持UDP协议登录。
+2. 调整了登录后的发包次序。
+3. 好友使用qsort快排。
+4. 完善了event的缓冲区，和以前的webqq结合使用。
+5. 使用assert函数，便于精简发布版本的代码。
+
+Version 2.0 (2008-7-17)
+New featrues:
+1. 包管理器的链表改用loop数据结构，精简代码，减少错误。
+2. (--a)%b可能为负数，原来没注意到，引发了改写mcb的内存错误。
+3. 发包序号策略改善，不再每次发包都递增。
+
+Version 1.9 (2008-7-15)
+New features:
+1. 重新策划程序，采用QQ2008贺岁版协议。
+2. 原来的group改名为qun，原group被用作管理好友分租。
+3. 增加memory.c内存管理和debug.c调试信息及日志记录。
+4. ccpaging建议改掉qqqun这个结构名，我打算下个版本把它改为qun_t，其它类似如
+member_t, group_t, buddy_t。
+5. 具备登录输入验证码功能，验证码图片保存在web/verify目录下。
+6. 修正qqsocket里接收数据溢出。
+
+Version 0.9 (2008-2-12)
+New features:
+1. MyQQ库可以登录多个ID，API全部更新。
+2. 修正好友名称里混有QQ号码和特殊字符。
+3. 完善了好友状态回调。
+4. 延长了重发包的时间，避免发送两次。
+5. 修正在自动回复时控制台提示的问题。
+6. 回调函数全部使用stdcall模式。
+
+
+Version 0.6 (2008-2-5)
+New features:
+1. Wait for message to send.
+2. Improve input.
+3. Check for repeated messages.
+4. Add refresh command.
+
+
+Version 0.5 (2008-2-4)
+New features:
+1. Send message to group.
+2. Get group list.
+3. List groups, online users and online group members.
+4. Get group member information.
+5. Get buddy information.
+6. The original interface works.
+
+
+Version 0.1 (2008-2-1)
+Use QQ2006 Protocol to login.
+Support Receiving messages from buddies and groups, sending messages to buddies.
+Compiled and linked on Linux(GCC 4.1, Debian etch).
+Compiled and linked on Windows(MingwGCC 3.4.2).
