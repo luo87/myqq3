@@ -6,6 +6,7 @@
 typedef struct qqgroup{
 	uint 		number;		//internal number
 	char		name[GROUPNAME_LEN];
+	uint		order;		//Does TX use this as an order of list?
 }qqgroup;
 
 struct qqclient;

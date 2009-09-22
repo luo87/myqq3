@@ -101,17 +101,19 @@ void prot_group_download_labels_reply( struct qqclient* qq, qqpacket* p )
 		get_byte( buf );	//unknown
 		get_word( buf );
 		uchar len;
+		uchar order;
 		while( buf->pos < buf->len ){
 			uchar number = get_byte( buf );
-			get_byte( buf );
+			order = get_byte( buf );
 			len = get_byte( buf );
 			//temp seems to be utf8 code
 			qqgroup *g = group_get( qq, number, 1 );
 			if( g == NULL )
-				continue;
+				return;
 			memset( g->name, 0, NICKNAME_LEN );
 			get_data( buf, (uchar*)g->name, len );
-//			DBG("group id: %u  name: %s", g->number, g->name );
+			g->order = order;
+			DBG("group id: %u  name: %s", g->number, g->name );
 		}
 		group_put_event( qq );
 		buddy_put_event( qq );
