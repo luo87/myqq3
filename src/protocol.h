@@ -156,7 +156,7 @@ struct qqclient;
 void prot_login_touch( struct qqclient* qq );
 void prot_login_touch_with_info( struct qqclient* qq, uchar* server_info, uchar len );
 void prot_login_touch_reply( struct qqclient* qq, qqpacket* p );
-void prot_login_request( struct qqclient* qq, token* tok, uint code, char png_data );
+void prot_login_request( struct qqclient* qq, token* tok, const char* code, char png_data );
 void prot_login_request_reply( struct qqclient* qq, qqpacket* p );
 void prot_login_verify( struct qqclient* qq );
 void prot_login_verify_reply( struct qqclient* qq, qqpacket* p );
@@ -184,7 +184,7 @@ void prot_user_keep_alive( struct qqclient* qq );
 void prot_user_keep_alive_reply( struct qqclient* qq, qqpacket* p );
 void prot_user_get_level( struct qqclient* qq );
 void prot_user_get_level_reply( struct qqclient* qq, qqpacket* p );
-void prot_user_request_token( struct qqclient* qq, uint number, uchar operation, ushort type, uint code );
+void prot_user_request_token( struct qqclient* qq, uint number, uchar operation, ushort type, const char* code );
 void prot_user_request_token_reply( struct qqclient* qq, qqpacket* p );
 //prot_im.c
 void prot_im_ack_recv( struct qqclient* qq, qqpacket* pre );

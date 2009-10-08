@@ -194,7 +194,7 @@ EXPORT void webqq_update_list( user* u )
 
 EXPORT void webqq_verify( user* u, uint code )
 {
-	qqclient_verify( u->qq, code );
+	qqclient_verify( u->qq, (char*) code );
 }
 
 

@@ -240,7 +240,7 @@ void qqclient_cleanup( qqclient* qq )
 	pthread_mutex_destroy( &qq->mutex_event );
 }
 
-int qqclient_verify( qqclient* qq, uint code )
+int qqclient_verify( qqclient* qq, const char* code )
 {
 	if( qq->login_finish == 1 ){
 		qqclient_set_process( qq, P_LOGIN );	//原来漏了这个  20090709

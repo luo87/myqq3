@@ -140,9 +140,9 @@ EXPORT void libqq_updatelist( qqclient* qq )
 EXPORT void libqq_verify( qqclient* qq, const char* code )
 {
 	if( code ){
-		qqclient_verify( qq, *(uint*)code );
+		qqclient_verify( qq, code );
 	}else{
-		qqclient_verify( qq, 0x00000000 );	//this will make the server change another png
+		qqclient_verify( qq, NULL );	//this will make the server change another png
 	}
 }
 

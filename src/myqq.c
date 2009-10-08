@@ -653,7 +653,7 @@ DO_LOGIN:
 		case P_VERIFYING:
 			MSG(_TEXT("请输入验证码（验证码目录下）: "));
 			scanf( "%s", input );
-			qqclient_verify( qq, *(uint*)input );
+			qqclient_verify( qq, input );
 			break;
 		case P_ERROR:
 			MSG(_TEXT("网络错误.\n"));
@@ -906,7 +906,7 @@ SELECT_CMD:
 			goto end;
 		case CMD_VERIFY:
 		case CMD_VERIFY2:
-			qqclient_verify( qq, *((uint*)arg) );
+			qqclient_verify( qq, arg );
 			break;
 		case CMD_ADD:
 		case CMD_ADD2:

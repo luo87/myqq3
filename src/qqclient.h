@@ -87,7 +87,7 @@ int qqclient_login( qqclient* qq );
 void qqclient_logout( qqclient* qq );
 void qqclient_detach( qqclient* qq );
 void qqclient_cleanup( qqclient* qq );
-int qqclient_verify( qqclient* qq, uint code );
+int qqclient_verify( qqclient* qq, const char* code );
 int qqclient_wait( qqclient* qq, int sec );
 void qqclient_change_status( qqclient* qq, uchar mode );
 int qqclient_get_event( qqclient* qq, char* event, int size, int wait );

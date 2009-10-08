@@ -290,7 +290,7 @@ void prot_user_get_level_reply( struct qqclient* qq, qqpacket* p )
 	
 }
 
-void prot_user_request_token( struct qqclient* qq, uint number, uchar operation, ushort type, uint code )
+void prot_user_request_token( struct qqclient* qq, uint number, uchar operation, ushort type, const char* code )
 {
 	qqpacket* p = packetmgr_new_send( qq, QQ_CMD_REQUEST_TOKEN );
 	if( !p ) return;
@@ -301,7 +301,7 @@ void prot_user_request_token( struct qqclient* qq, uint number, uchar operation,
 		put_word( buf, type );	//
 		put_int( buf, number );
 		put_word( buf, 4 );
-		put_int( buf, htonl(code) );
+		put_data( buf, (uchar*)code, 4 );
 		put_word( buf, strlen(qq->data.qqsession));
 		put_data( buf, (uchar*)qq->data.qqsession, strlen(qq->data.qqsession));
 	}else{
