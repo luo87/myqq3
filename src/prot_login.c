@@ -124,7 +124,7 @@ void prot_login_touch_reply( struct qqclient* qq, qqpacket* p )
 	}
 }
 
-void prot_login_request( struct qqclient* qq, token* tok, char* code, char png_data )
+void prot_login_request( struct qqclient* qq, token* tok, const char* code, char png_data )
 {
 	
 	qqpacket* p = packetmgr_new_send( qq, QQ_CMD_LOGIN_REQUEST );
