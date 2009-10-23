@@ -514,36 +514,36 @@ void prot_buddy_get_info( struct qqclient* qq, uint number )
 	qqpacket* p = packetmgr_new_send( qq, QQ_CMD_BUDDY_INFO );
 	if( !p ) return;
 	bytebuffer *buf = p->buf;
-	put_word( buf, 0x0001 );
-	put_int( buf, number );
-	buf->pos += 22;	//22 zeros
+	put_word( buf, 0x0001 );   //003C协议版本号
+	put_int( buf, number );    //QQ号
+	buf->pos += 22;	//22 zeros //腾讯保留
 	put_word( buf, 0x001A );	//entry count  4E和52是标记分隔符
 	put_word( buf, 0x4E22 );	//nickname
 	put_word( buf, 0x4E25 );	//邮政编码
 	put_word( buf, 0x4E26 );	//地址
 	put_word( buf, 0x4E27 );	//家庭电话
-	put_word( buf, 0x4E29 );	//
-	put_word( buf, 0x4E2A );	//
+	put_word( buf, 0x4E29 );	//性别
+	put_word( buf, 0x4E2A );	//真实名称
 	put_word( buf, 0x4E2B );	//email
 	put_word( buf, 0x4E2C );	//occupation
 	put_word( buf, 0x4E2D );	//主页
-	put_word( buf, 0x4E2E );	//
-	put_word( buf, 0x4E2F );	//
+	put_word( buf, 0x4E2E );	//国家编码，中国为31
+	put_word( buf, 0x4E2F );	//头像索引，例如237=237/3=79=0x4F
 	put_word( buf, 0x4E30 );	//手机
 	put_word( buf, 0x4E31 );	//资料可见度
 	put_word( buf, 0x4E33 );	//个人说明
 	put_word( buf, 0x4E35 );	//毕业学校
-	put_word( buf, 0x4E36 );	//
-	put_word( buf, 0x4E37 );	//
-	put_word( buf, 0x4E38 );	//
-	put_word( buf, 0x4E3F );	//
-	put_word( buf, 0x4E40 );	//
+	put_word( buf, 0x4E36 );	//星座
+	put_word( buf, 0x4E37 );	//生肖
+	put_word( buf, 0x4E38 );	//血型
+	put_word( buf, 0x4E3F );	//生日
+	put_word( buf, 0x4E40 );	//国家编码+省市编码
 	put_word( buf, 0x4E41 );	//第1语言
 	put_word( buf, 0x4E42 );	//第2语言
 	put_word( buf, 0x4E43 );	//第3语言
 	put_word( buf, 0x4E45 );	//年龄
-	put_word( buf, 0x520B );	//会员信息
-	put_word( buf, 0x520F );	//
+	put_word( buf, 0x520B );	//会员标志
+	put_word( buf, 0x520F );	//客户端标识
 	post_packet( qq, p, SESSION_KEY );
 }
 
