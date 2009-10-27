@@ -1,7 +1,7 @@
 ﻿# 是否记录发送和接收包的信息
 QQPacketLog = true
 # 是否打印控制台调试信息。
-QQTerminalLog = false
+QQTerminalLog = true
 # 日志目录，删除下面一条将不记录日志。
 QQLogDir = ./log
 # 验证码目录

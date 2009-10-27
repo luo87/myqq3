@@ -103,7 +103,7 @@ void prot_im_send_msg_ex( struct qqclient* qq, uint to, char* msg, int len,
 
 void prot_im_ack_recv( struct qqclient* qq, qqpacket* pre )
 {
-	qqpacket* p = packetmgr_new_send( qq, QQ_CMD_RECV_IM );
+	qqpacket* p = packetmgr_new_send( qq, pre->command );
 	if( !p ) return;
 	bytebuffer *buf = p->buf;
 	p->seqno = pre->seqno;
@@ -347,10 +347,12 @@ void prot_im_recv_msg( struct qqclient* qq, qqpacket* p )
 	ushort im_type;
 	int len;
 	qqmessage *msg;
+/* 091027 This code maybe good for a client that prints the message as soon as it gets one.
 	if( qq->login_finish!=1 ){	//not finished login
 		DBG("Early message ... Abandoned.");
 		return;
 	}
+*/
 	NEW( msg, sizeof( qqmessage ) );
 	if( !msg )
 		return;

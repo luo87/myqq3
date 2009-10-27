@@ -80,8 +80,7 @@ qqpacket* packetmgr_new_send( qqclient* qq, int cmd )
 
 void packetmgr_inc_seqno( qqclient* qq )
 {
-	qq->seqno ++;
-//	qq->seqno = rand();
+	qq->seqno = rand();
 }
 
 void packetmgr_new_seqno( qqclient* qq )

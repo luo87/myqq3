@@ -55,16 +55,14 @@ static void randkey(uchar* key)
 
 static void restore_version_data( struct qqclient* qq )
 {
-	static uchar QQ09_LOCALE[] = {0x00,0x00,0x08,0x04,0x01,0xE0}; 
-	static uchar QQ09_VERSION_SPEC[] = {0x00,0x00,0x02,0x20,0x00,
-		0x00,0x00,0x01,0x00,0x00,0x08,0xFB}; 
-	static uchar QQ09_EXE_HASH[] = {0xD5,0xCB,0x09,0x9A,0x61,0x63,
-		0x16,0x7E,0xEA,0xF8,0x05,0x6E,0xFF,0x50,0xF3,0x12};
-	memcpy( qq->data.locale, QQ09_LOCALE, sizeof(QQ09_LOCALE) );
-	memcpy( qq->data.version_spec, QQ09_VERSION_SPEC, 
-		sizeof(QQ09_VERSION_SPEC) );
-	memcpy( qq->data.exe_hash, QQ09_EXE_HASH, 
-		sizeof(QQ09_EXE_HASH) );
+	static uchar locale[] = QQ09_LOCALE; 
+	static uchar verspec[] = QQ09_VERSION_SPEC; 
+	static uchar exehash[] = QQ09_EXE_HASH;
+	memcpy( qq->data.locale, locale, sizeof(locale) );
+	memcpy( qq->data.version_spec, verspec, 
+		sizeof(verspec) );
+	memcpy( qq->data.exe_hash, exehash, 
+		sizeof(exehash) );
 }
 
 void prot_login_touch( struct qqclient* qq )

@@ -29,6 +29,10 @@ MacOSX编译：
 
 Update History:
 
+Version 3.20(2009-10-27)
+1. QQInternational Beta1 Protocol.
+2. Random packet seqno.
+
 Version 3.19(2009-9-10)
 1. 修复获取群列表（3.18的登录时跳过了获取群列表）。
 2. 增加获取好友详细资料。

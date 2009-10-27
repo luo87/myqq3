@@ -63,7 +63,7 @@ int qqsocket_create( int type, char* ip, ushort port )
 	switch( type )
 	{
 	case TCP:
-		fd = socket( PF_INET, SOCK_STREAM, 0 );
+		fd = socket( PF_INET, SOCK_STREAM, IPPROTO_TCP );
 		memset( &addr, 0, sizeof(struct sockaddr_in) );
 		addr.sin_family = PF_INET;
 		if( ip )
