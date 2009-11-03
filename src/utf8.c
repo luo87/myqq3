@@ -72,11 +72,12 @@ void gb_to_utf8 ( char* src, char* dst, int len )
 	free( strA );
 }
 #else   //Linux
+// starkwong: In iconv implementations, inlen and outlen should be type of size_t not uint, which is different in length on Mac
 void utf8_to_gb( char* src, char* dst, int len )
 {
 	int ret = 0;
-	uint inlen = strlen( src );
-	uint outlen = len;
+	size_t inlen = strlen( src );
+	size_t outlen = len;
 	char* inbuf = src;
 	char* outbuf = dst;
 	iconv_t cd;
@@ -91,16 +92,31 @@ void utf8_to_gb( char* src, char* dst, int len )
 void gb_to_utf8( char* src, char* dst, int len )
 {
 	int ret = 0;
-	uint inlen = strlen( src );
-	uint outlen = len;
+	size_t inlen = strlen( src );
+	size_t outlen = len;
 	char* inbuf = src;
+	char* outbuf2 = NULL;
 	char* outbuf = dst;
 	iconv_t cd;
+	int c;
+
+	// starkwong: if src==dst, the string will become invalid during conversion since UTF-8 is 3 chars in Chinese but GBK is mostly 2 chars
+	if (src==dst) {
+		outbuf2=(char*)malloc(len);
+		memset(outbuf2,0,len);
+		outbuf=outbuf2;
+	}
 	cd = iconv_open( "UTF-8", "GBK" );
 	if ( cd != (iconv_t)-1 ){
 		ret = iconv( cd, &inbuf, &inlen, &outbuf, &outlen );
 		if( ret != 0 )
 			printf("iconv failed err: %s\n", strerror(errno) );
+
+		if (outbuf2!=NULL) {
+			strcpy(dst,outbuf2);
+			free(outbuf2);
+		}
+
 		iconv_close( cd );
 	}
 }

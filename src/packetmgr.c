@@ -353,7 +353,7 @@ int packetmgr_check_packet( struct qqclient* qq, int timeout )
 			loop_remove( &mgr->sent_loop, p );
 		}
 		if( p ){
-			if( p->send_times >= 2 ){
+			if( p->send_times >= 10 ){
 				MSG("[%u] Failed to send the packet. command: %x\n", qq->number, p->command );
 				if( p->command == QQ_CMD_SEND_IM ){
 					buddy_msg_callback( qq, 10000, time(NULL), "刚才某条消息发送失败。" );
