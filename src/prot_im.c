@@ -366,6 +366,9 @@ void prot_im_recv_msg( struct qqclient* qq, qqpacket* p )
 	from_port = get_word( buf );
 	im_type = get_word( buf );
 	msg->im_type = im_type;
+#ifdef NO_IM
+	if( im_type == QQ_RECV_IM_SYS_NOTIFICATION ){
+#endif
 	switch( im_type ){
 	case QQ_RECV_IM_BUDDY_0801:
 		DBG("QQ_RECV_IM_BUDDY_0801");
@@ -394,6 +397,9 @@ void prot_im_recv_msg( struct qqclient* qq, qqpacket* p )
 		len = get_word( buf ); 
 		buf->pos += len;
 		process_buddy_im( qq, p, msg );
+		break;
+	case QQ_RECV_IM_SOMEBODY:
+		DBG("QQ_RECV_IM_SOMEBODY");
 		break;
 	case QQ_RECV_IM_WRITING:
 //		DBG("QQ_RECV_IM_WRITING");
@@ -445,6 +451,9 @@ void prot_im_recv_msg( struct qqclient* qq, qqpacket* p )
 	default:
 		DBG("Unknown message type : %x", im_type );
 	}
+#ifdef NO_IM
+	}
+#endif
 	//ack recv
 	prot_im_ack_recv( qq, p );
 	DEL( msg );

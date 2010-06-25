@@ -1,5 +1,5 @@
 ﻿# 是否记录发送和接收包的信息
-QQPacketLog = true
+QQPacketLog = false
 # 是否打印控制台调试信息。
 QQTerminalLog = true
 # 日志目录，删除下面一条将不记录日志。

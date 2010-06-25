@@ -35,13 +35,13 @@ void print_error(char* file, char* function, int line, const char *fmt, ...)
 	if( !dbg_term && !dbg_file )
 		return;
 	va_start(args, fmt);
-	i=vsprintf( printbuf, fmt, args );
+	i=vsnprintf( printbuf, 500, fmt, args );
 	printbuf[i] = 0;
 	va_end(args);
-#ifdef __WIN32__
-	utf8_to_gb( printbuf, printbuf, i );
-#endif
 	if( dbg_term ){
+		#ifdef __WIN32__
+			utf8_to_gb( printbuf, printbuf, i );
+		#endif
 		printf("%s(%d): %s\n", function, line, printbuf);
 	}
 	if( dbg_file ){

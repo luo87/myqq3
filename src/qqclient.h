@@ -34,7 +34,7 @@ typedef struct qqclient{
 	ushort		version;
 	ushort		seqno;
 	int			socket;
-	char		password[32];
+	char		password[64];
 	uchar		md5_pass1[16];
 	uchar		md5_pass2[16];
 	uint		server_ip;
@@ -78,6 +78,7 @@ typedef struct qqclient{
 	union{
 		struct qqdata_2009	data;
 	};
+	int		keep_alive_counter;
 }qqclient;
 
 
@@ -97,5 +98,6 @@ int qqclient_put_message( qqclient* qq, char* msg );
 void qqclient_get_server( qqclient* qq );
 int qqclient_add( qqclient* qq, uint number, char* request_str );
 int qqclient_del( qqclient* qq, uint number );
+void qqclient_keepalive(qqclient* qq);
 
 #endif

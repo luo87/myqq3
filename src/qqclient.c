@@ -108,50 +108,60 @@ int qqclient_md5_create( qqclient* qq, uint num, uchar* md5_pass )
 	return 0;
 }
 
-#define INTERVAL 5
-static void* qqclient_keepalive( void* data )
+
+#define INTERVAL 1
+void qqclient_keepalive(qqclient* qq)
+{
+	int counter = qq->keep_alive_counter ++;
+	if( qq->process == P_LOGGING || qq->process == P_LOGIN || qq->process == P_VERIFYING ){
+		packetmgr_check_packet( qq, 5 );
+		if( qq->process == P_LOGIN ){
+			//1次心跳/分钟
+			if( counter % ( 1 *60*INTERVAL) == 0 ){
+				prot_user_keep_alive( qq );
+			}
+#ifndef NO_BUDDY_INFO
+			//10分钟刷新在线列表 QQ2009是5分钟刷新一次。
+			if( counter % ( 10 *60*INTERVAL) == 0 ){
+				prot_buddy_update_online( qq, 0 );
+				qun_update_online_all( qq );
+			}
+#endif
+			//30分钟刷新状态和刷新等级
+			if( counter % ( 30 *60*INTERVAL) == 0 ){
+				prot_user_change_status( qq );
+				prot_user_get_level( qq );
+			}
+		//	//等待登录完毕
+			if( qq->login_finish==0 ){
+				if( loop_is_empty(&qq->packetmgr.ready_loop) && 
+					loop_is_empty(&qq->packetmgr.sent_loop) ){
+					qq->login_finish = 1;	//we can recv message now.
+				}
+			}
+			qq->online_clock ++;
+		}
+	}
+}
+
+#ifndef NO_KEEPALIVE
+static void* qqclient_keepalive_proc( void* data )
 {
 	qqclient* qq = (qqclient*) data;
-	int counter = 0;
 	int sleepintv = 1000/INTERVAL;
+	int counter = 0;
 	DBG("keepalive");
 	while( qq->process != P_INIT ){
 		counter ++;
 		if( counter % INTERVAL == 0 ){
-			if( qq->process == P_LOGGING || qq->process == P_LOGIN || qq->process == P_VERIFYING ){
-				packetmgr_check_packet( qq, 5 );
-				if( qq->process == P_LOGIN ){
-					//1次心跳/分钟
-					if( counter % ( 1 *30*INTERVAL) == 0 ){
-						prot_user_keep_alive( qq );
-					}
-					//10分钟刷新在线列表 QQ2009是5分钟刷新一次。
-					if( counter % ( 10 *60*INTERVAL) == 0 ){
-						prot_buddy_update_online( qq, 0 );
-						qun_update_online_all( qq );
-					}
-					//30分钟刷新状态和刷新等级
-					if( counter % ( 30 *60*INTERVAL) == 0 ){
-						prot_user_change_status( qq );
-						prot_user_get_level( qq );
-					}
-				//	//等待登录完毕
-					if( qq->login_finish==0 ){
-						if( loop_is_empty(&qq->packetmgr.ready_loop) && 
-							loop_is_empty(&qq->packetmgr.sent_loop) ){
-							qq->login_finish = 1;	//we can recv message now.
-						}
-					}
-					qq->online_clock ++;
-				}
-			}
+			qqclient_keepalive(qq);
 		}
 		USLEEP( sleepintv );
 	}
 	DBG("end.");
 	return NULL;
 }
-
+#endif
 
 int qqclient_login( qqclient* qq )
 {
@@ -183,7 +193,10 @@ int qqclient_login( qqclient* qq )
 		prot_login_touch( qq );
 	}
 	//keep
-	ret = pthread_create( &qq->thread_keepalive, NULL, qqclient_keepalive, (void*)qq );
+	qq->keep_alive_counter = 0;
+#ifndef NO_KEEPALIVE
+	ret = pthread_create( &qq->thread_keepalive, NULL, qqclient_keepalive_proc, (void*)qq );
+#endif
 	return 0;
 }
 
@@ -214,11 +227,13 @@ void qqclient_logout( qqclient* qq )
 	}
 	qq->login_finish = 0;
 	DBG("joining keepalive");
-#ifdef __WIN32__
+#ifndef NO_KEEPALIVE
+	#ifdef __WIN32__
 	pthread_join( qq->thread_keepalive, NULL );
-#else
+	#else
 	if( qq->thread_keepalive )
 		pthread_join( qq->thread_keepalive, NULL );
+	#endif
 #endif
 	packetmgr_end( qq );
 }
@@ -379,7 +394,7 @@ int qqclient_put_message( qqclient* qq, char* msg )
 void qqclient_set_process( qqclient *qq, int process )
 {
 	qq->process = process;
-	char event[16];
+	char event[24];
 	sprintf( event, "process^$%d", process );
 	qqclient_put_event( qq, event );
 }

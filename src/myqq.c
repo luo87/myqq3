@@ -211,7 +211,7 @@ static char* to_utf8( char* s )
 #else
 #define _TEXT
 #endif
-static int getline(char *s, int lim) {
+static int inputline(char *s, int lim) {
 	char *t;
 	int c;
 
@@ -682,7 +682,7 @@ DO_LOGIN:
 	MSG( _TEXT(help_msg) );
 	while( qq->process != P_INIT ){
 		RESET_INPUT
-		len = getline( input, 1023 );
+		len = inputline( input, 1023 );
 		if( len < 1 ) continue;
 		char* sp = strchr( input, ' ' );
 		if( sp ){
@@ -913,7 +913,7 @@ SELECT_CMD:
 		{
 			sprintf( print_buf, "添加[%d]的附言（默认空）：", atoi(arg) );
 			MSG( _TEXT(print_buf) );
-			getline( input, 50 );
+			inputline( input, 50 );
 			qqclient_add( qq, atoi(arg), input );
 			break;
 		}

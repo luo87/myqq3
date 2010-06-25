@@ -123,7 +123,7 @@ int http_request( int* http_sock, char* url, char* session, char* data, int* dat
 			if( ret > 0 )	len += ret;	else	break;
 		}
 		next = strstr( header, "\r\n\r\n" ) + 4;
-		if( next ){
+		if( next-4>0 ){
 			if( *datalen > data_len ){ 
 				memcpy( (void*)data, (void*)next, data_len );
 				*datalen = data_len;

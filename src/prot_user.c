@@ -83,7 +83,7 @@ void prot_user_change_status_reply( struct qqclient* qq, qqpacket* p )
 	if( get_byte( buf ) == '0' ){
 		qq->self->status = qq->mode;
 		DBG("change status to %d", qq->mode );
-		char event[16];
+		char event[20];
 		sprintf( event, "status^$%d", qq->mode );
 		qqclient_put_event( qq, event );
 	}else{
@@ -105,8 +105,7 @@ void prot_user_get_key_reply( struct qqclient* qq, qqpacket* p )
 {
 	bytebuffer *buf = p->buf;
 	uchar cmd, result;
-	uchar key[16];
-	token tok;
+	uchar key[20];
 	cmd = get_byte( buf );
 	result = get_byte( buf );
 	if( result != 0 ){
@@ -120,7 +119,7 @@ void prot_user_get_key_reply( struct qqclient* qq, qqpacket* p )
 		get_data(buf,qq->data.file_token.data, qq->data.file_token.len); 
 //		get_token( buf, &tok );
 		memcpy( qq->data.file_key, key, 16 );
-		qq->data.file_token = tok;
+//		qq->data.file_token = tok;
 		DBG("got file key.");
 		break;
 	default:

@@ -29,10 +29,14 @@ typedef unsigned char uchar;
 #endif
 
 //Preference  more in protocol.c: process_packet
-//#define NO_BUDDY_INFO	//don't get buddy list or online list
-//#define NO_BUDDY_DETAIL_INFO //don't get buddy mail account, alias, signiture info
-//#define NO_QUN_INFO //don't get qun info
-//#define NO_GROUP_INFO //don't get group info
+/*
+#define NO_BUDDY_INFO	//don't get buddy list or online list
+#define NO_BUDDY_DETAIL_INFO //don't get buddy mail account, alias, signiture info
+#define NO_QUN_INFO //don't get qun info
+#define NO_GROUP_INFO //don't get group info
+#define NO_IM //don't get instant messages
+#define NO_KEEPALIVE
+*/
 
 #define MAX_LOOP_PACKET 32
 #define MAX_COMMAND 0x0200

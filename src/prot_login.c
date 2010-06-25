@@ -44,7 +44,7 @@
 #endif
 static int rand2()
 {
-	return 0;//(rand()<<16)+rand();
+	return 0;//(rand2()<<16)+rand2();
 }
 static void randkey(uchar* key)
 {
@@ -226,13 +226,13 @@ void prot_login_verify( struct qqclient* qq )
 		return;
 	}
 	verify_data->size = PACKET_SIZE;
-	put_int( verify_data, rand() );	//random??
+	put_int( verify_data, rand2() );	//random??
 	put_word( verify_data, 0x0001 );
 	put_int( verify_data, qq->number );
 	put_data( verify_data, qq->data.version_spec, sizeof(qq->data.version_spec) );
 	put_byte( verify_data, 00 );
 	put_word( verify_data, 00 );	//0x0001 什么来的？
-	put_data( verify_data, qq->md5_pass1, sizeof(qq->md5_pass1) );
+	put_data( verify_data, qq->md5_pass1, 16 );
 	put_int( verify_data, qq->server_time );
 	verify_data->pos += 13;
 	put_int( verify_data, qq->server_ip );
@@ -266,12 +266,12 @@ void prot_login_verify( struct qqclient* qq )
 	randkey( unknown6 );
 	randkey( unknown7 );
 	put_byte( buf, 0x01 );
-	put_int( buf, rand()  );
+	put_int( buf, rand2()  );
 //	put_int( buf, 0x0741E9748  );
 	put_word( buf, sizeof(unknown6) );
 	put_data( buf, unknown6, sizeof(unknown6) );
 	put_byte( buf, 0x02 );
-	put_int( buf, rand()  );
+	put_int( buf, rand2()  );
 //	put_int( buf, 0x8BED382E  );
 	put_word( buf, sizeof(unknown7) );
 	put_data( buf, unknown7, sizeof(unknown7) );
@@ -486,7 +486,7 @@ void prot_login_send_info( struct qqclient* qq )
 	put_data( buf, qq->data.login_info_large.data, qq->data.login_info_large.len );
 	buf->pos += 35;
 	put_data( buf, qq->data.exe_hash, sizeof(qq->data.exe_hash) );
-	put_byte( buf, rand() );	//unknown important byte
+	put_byte( buf, rand2() );	//unknown important byte
 	put_byte( buf, qq->mode );
 	put_data( buf, unknown5, sizeof(unknown5) );
 	put_data( buf, qq->data.server_data, sizeof(qq->data.server_data) );
@@ -499,14 +499,14 @@ void prot_login_send_info( struct qqclient* qq )
 	put_int( buf, 0x08041801 );
 	put_byte( buf, 0x40 );	//length of the following
 	put_byte( buf, 0x01 );
-	put_int( buf, rand()  );
+	put_int( buf, rand2()  );
 //	put_int( buf, 0x0741E9748  );
 	put_word( buf, sizeof(unknown6) );
 	put_data( buf, unknown6, sizeof(unknown6) );
 	put_data( buf, unknown5, sizeof(unknown5) );
 	put_data( buf, qq->data.server_data, sizeof(qq->data.server_data) );
 	put_byte( buf, 0x02 );
-	put_int( buf, rand()  );
+	put_int( buf, rand2()  );
 //	put_int( buf, 0x8BED382E  );
 	put_word( buf, sizeof(unknown7) );
 	put_data( buf, unknown7, sizeof(unknown7) );
@@ -559,8 +559,12 @@ void prot_login_send_info_reply( struct qqclient* qq, qqpacket* p )
 	//get information
 	prot_user_change_status( qq );
 	prot_user_get_level( qq );
+#ifndef NO_GROUP_INFO
 	group_update_list( qq );
+#endif
+#ifndef NO_BUDDY_INFO
 	buddy_update_list( qq );
+#endif
 #ifndef NO_QUN_INFO
 	qun_update_all( qq );
 #endif

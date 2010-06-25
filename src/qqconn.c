@@ -152,7 +152,7 @@ int qqconn_establish( qqclient* qq )
 	struct in_addr addr;
 	addr.s_addr = htonl( qq->server_ip );
 	sprintf( tmp, proxy_format, inet_ntoa( addr ), qq->server_port );
-	ret = qqsocket_send( qq->socket, tmp, strlen(tmp) );
+	ret = qqsocket_send( qq->socket, (uchar*)tmp, strlen(tmp) );
 	if( ret<=0 ){
 		DBG("failed to send data to proxy sever.");
 		qqclient_set_process( qq, P_ERROR );

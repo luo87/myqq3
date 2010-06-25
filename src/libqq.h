@@ -23,6 +23,7 @@ EXPORT void libqq_cleanup();
 EXPORT struct qqclient* libqq_create( uint number, char* pass );
 EXPORT int libqq_login( struct qqclient* qq );
 EXPORT int libqq_logout( struct qqclient* qq );
+EXPORT int libqq_keepalive( struct qqclient* qq );
 EXPORT int libqq_detach( struct qqclient* qq );
 EXPORT int libqq_getmessage( struct qqclient* qq, char* buf, int size, int wait );
 EXPORT int libqq_sendmessage( struct qqclient* qq, uint to, char* buf, char qun_msg );

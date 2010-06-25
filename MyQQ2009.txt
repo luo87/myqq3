@@ -6,7 +6,7 @@ If you are interested in MyQQ and have improved it, I suggest you that you send
 your source code to me then everyone will know your work and thank you!
 
 You can get the latest version of this software (including its source code) at
-http://home.xxsyzx.com
+xiaoxia.org
 
 注意：本软件以及源代码仅供学习研究使用。所用协议皆属个人业余的黑匣分析结果。
 
@@ -25,9 +25,11 @@ Linux编译：
 MacOSX编译：
 在终端里执行
 	make -C src -fmac.mak clean all
-由于最初没有周全考虑，目前版本暂时不兼容64位的机器，望见谅！
 
 Update History:
+
+Version 3.21(2010-06)
+1. 修正了一些东西。
 
 Version 3.20(2009-10-27)
 1. QQInternational Beta1 Protocol.

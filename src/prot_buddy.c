@@ -58,6 +58,7 @@ void prot_buddy_update_list_reply( struct qqclient* qq, qqpacket* p )
 		b->age = get_byte( buf );
 		b->sex = get_byte( buf );
 		uchar name_len = get_byte( buf );	//name_len
+		name_len = MIN( NICKNAME_LEN-1, name_len );
 		get_data( buf,  (uchar*)b->nickname, name_len );	
 		b->nickname[name_len] = 0;
 		buf->pos += 27;
@@ -569,59 +570,59 @@ void prot_buddy_get_info_reply( struct qqclient* qq, qqpacket* p )
 		switch(type){
 		case 0x4E22://nickname
 			if( len<NICKNAME_LEN )
-				get_data(buf, b->nickname, len);
+				get_data(buf, (uchar*)b->nickname, len);
 			break;
 		case 0x4E25://post code
 			if( len<32 )
-				get_data(buf, b->post_code, len);
+				get_data(buf, (uchar*)b->post_code, len);
 			break;
 		case 0x4E26://address
 			if( len<64 )
-				get_data(buf, b->address, len);
+				get_data(buf, (uchar*)b->address, len);
 			break;
 		case 0x4E27://homephone
 			if( len<32 )
-				get_data(buf, b->homephone, len);
+				get_data(buf, (uchar*)b->homephone, len);
 			break;
 		case 0x4E28://email
 			if( len<32 )
-				get_data(buf, b->email, len);
+				get_data(buf, (uchar*)b->email, len);
 			break;
 		case 0x4E30://mobile
 			if( len<32 )
-				get_data(buf, b->mobilephone, len);
+				get_data(buf, (uchar*)b->mobilephone, len);
 			break;
 		case 0x4E2C://occupation
 			if( len<32 )
-				get_data(buf, b->occupation, len);
+				get_data(buf, (uchar*)b->occupation, len);
 			break;
 		case 0x4E2D://homepage
 			if( len<64 )
-				get_data(buf, b->homepage, len);
+				get_data(buf, (uchar*)b->homepage, len);
 			break;
 		case 0x4E33://brief
 			if( len<256 )
-				get_data(buf, b->brief, len);
+				get_data(buf, (uchar*)b->brief, len);
 			break;
 		case 0x4E35://school
 			if( len<32 )
-				get_data(buf, b->school, len);
+				get_data(buf, (uchar*)b->school, len);
 			break;
 		case 0x4E3F://birth
 			if( len<16 )
-				get_data(buf, b->birth, len);
+				get_data(buf, (uchar*)b->birth, len);
 			break;
 		case 0x4E23://country
 			if( len<16 )
-				get_data(buf, b->country, len);
+				get_data(buf, (uchar*)b->country, len);
 			break;
 		case 0x4E24://province
 			if( len<16 )
-				get_data(buf, b->province, len);
+				get_data(buf, (uchar*)b->province, len);
 			break;
 		case 0x4E34://city
 			if( len<16 )
-				get_data(buf, b->city, len);
+				get_data(buf, (uchar*)b->city, len);
 			break;
 		default:
 			buf->pos += len;

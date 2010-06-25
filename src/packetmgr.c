@@ -36,7 +36,9 @@
 
 static void delete_func(const void *p)
 {
-	DEL( ((qqpacket*)p)->buf );	DEL( p );
+	if( p ){
+		DEL( ((qqpacket*)p)->buf );	DEL( p );
+	}
 }
 
 qqpacket* packetmgr_new_packet( qqclient* qq )
@@ -262,7 +264,7 @@ void* packetmgr_recv( void* data )
 		if( qq->network == TCP || qq->network == PROXY_HTTP ){
 			if ( pos > 2 ){
 				if( !qq->proxy_established && qq->network == PROXY_HTTP ){
-					if( strstr( recv_buf, "200" )!=NULL ){
+					if( strstr( (char*)recv_buf, "200" )!=NULL ){
 						DBG("proxy server reply ok!");
 						qq->proxy_established = 1;
 						prot_login_touch( qq );
@@ -275,7 +277,7 @@ void* packetmgr_recv( void* data )
 					}else{
 						DBG("proxy server reply failure!");
 						recv_buf[ret]=0;
-						DBG( recv_buf );
+						DBG( "%s", recv_buf );
 						qqclient_set_process( qq, P_ERROR );
 					}
 				}else{
@@ -360,11 +362,9 @@ int packetmgr_check_packet( struct qqclient* qq, int timeout )
 				}
 				//make an event to tell the program that we have a
 				//problem.
-				char *event;
-				event = (char*)malloc(64);
+				char event[64];
 				sprintf( event, "sendfailed^$%d^$%d", p->command, p->seqno );
 				qqclient_put_event( qq, event );
-				free(event);
 				delete_func( p );
 				mgr->failed_packets ++;
 				//To avoid too many failed packets, just shut it down.
