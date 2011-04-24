@@ -155,6 +155,7 @@ static void parse_quninfo( struct qqclient* qq, qqpacket* p, qqqun* q )
 		q->intro[len] = 0;
 		//token data
 		get_token( buf, &q->token_cmd );
+		get_word( buf ); //00 05  qq2011 beta2
 	}
 	last_number = get_int( buf );	//member last came in
 	more = get_byte( buf );	//more member data
@@ -197,7 +198,7 @@ static void parse_memberinfo( struct qqclient* qq, qqpacket* p, qqqun* q )
 		get_data( buf,  (uchar*)m->nickname, name_len );
 		m->nickname[name_len] = 0;
 		//TX技术改革不彻底，还保留使用GB码 2009-1-25 11:02
-		gb_to_utf8( m->nickname, m->nickname, NICKNAME_LEN-1 );
+		//gb_to_utf8( m->nickname, m->nickname, NICKNAME_LEN-1 ); after qq2011 beta2 tx used utf8
 		get_word( buf );	//00 00
 		m->qqshow = get_byte( buf );
 		m->flag = get_byte( buf );

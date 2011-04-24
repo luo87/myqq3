@@ -61,7 +61,7 @@ void prot_buddy_update_list_reply( struct qqclient* qq, qqpacket* p )
 		name_len = MIN( NICKNAME_LEN-1, name_len );
 		get_data( buf,  (uchar*)b->nickname, name_len );	
 		b->nickname[name_len] = 0;
-		buf->pos += 27;
+		buf->pos += 32;//27;
 	}
 	if( next_pos != 0xffff ){
 		prot_buddy_update_list( qq, next_pos );
@@ -324,7 +324,7 @@ void prot_buddy_update_alias_reply( struct qqclient* qq, qqpacket* p )
 			uchar result = get_byte( buf );
 			while( buf->pos < buf->len ){
 				uint number = get_int( buf );
-				qqbuddy* b = buddy_get( qq, number, 0 );
+				qqbuddy* b = buddy_get( qq, number, 1 );
 				if( !b ){
 					DBG("b==NULL");
 					return;

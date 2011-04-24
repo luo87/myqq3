@@ -42,9 +42,13 @@
 #define RANDOM
 #ifdef RANDOM
 #endif
+
+#define USE_RANDKEY
+
+
 static int rand2()
 {
-	return 0;//(rand2()<<16)+rand2();
+	return (rand()<<16)+rand();
 }
 static void randkey(uchar* key)
 {
@@ -208,7 +212,11 @@ void prot_login_request_reply( struct qqclient* qq, qqpacket* p )
 	}else{
 		DBG("process verify password");
 		qq->data.token_c = answer_token;
+#ifdef LOGIN_WAIT
+		qqclient_set_process( qq, P_WAITING );
+#else
 		prot_login_verify( qq );
+#endif
 	}
 	result = 0;
 }
@@ -231,7 +239,7 @@ void prot_login_verify( struct qqclient* qq )
 	put_int( verify_data, qq->number );
 	put_data( verify_data, qq->data.version_spec, sizeof(qq->data.version_spec) );
 	put_byte( verify_data, 00 );
-	put_word( verify_data, 00 );	//0x0001 什么来的？
+	put_word( verify_data, 0x0000 );	//0x0000 什么来的？
 	put_data( verify_data, qq->md5_pass1, 16 );
 	put_int( verify_data, qq->server_time );
 	verify_data->pos += 13;
@@ -242,7 +250,7 @@ void prot_login_verify( struct qqclient* qq )
 	put_data( verify_data, qq->data.verify_key1, 0x10 );
 	put_data( verify_data, qq->data.verify_key2, 0x10 );
 	//
-	put_word( buf, 0x00CA );	//sub cmd??
+	put_word( buf, 0x00DE );	//sub cmd??
 	put_word( buf, 0x0001 );
 	put_data( buf, qq->data.locale, sizeof(qq->data.locale) );
 	put_data( buf, qq->data.version_spec, sizeof(qq->data.version_spec) );
@@ -252,30 +260,44 @@ void prot_login_verify( struct qqclient* qq )
 	
 	int out_len = 120;
 	uchar encrypted[120+10];
-	qqencrypt( verify_data->data, verify_data->pos, qq->md5_pass2, encrypted, &out_len );
+	qqencrypt( verify_data->data, verify_data->pos, qq->md5_pass_qq, encrypted, &out_len );
 	put_word( buf, out_len );
 	put_data( buf, encrypted, out_len );
 	
-	put_word( buf, 0x0000 );
-	put_word( buf, 0x018B );
+	put_word( buf, 0x0014 );
+	static uchar unknown5[] = {0xBB,0x7E,0xAF,0x56,0x40,0x09,0xE8,0xAA,
+		0xC6,0x23,0x02,0x78,0x27,0x12,0x4A,0xD4,0xAB,0x3B,0x4E,0x30 };
+#ifdef USE_RANDKEY
+	randkey( unknown5 );
+#endif
+	put_data( buf, unknown5, sizeof(unknown5) );
+	put_word( buf, 0x0177 );
 	put_byte( buf, 0x2E );	//length of the following info
-	static uchar unknown6[] = {0xE9,0xC4,0xD6,0x5C,0x4D,0x9D,
-		0xA0,0x17,0xE5,0x24,0x6B,0x55,0x57,0xD3,0xAB,0xF1 };
+	static uchar unknown6[] = {0x92,0xA7,0xAC,0x76,0xD8,
+		0x13,0xCD,0x12,0x26,0xCD,0x31,0x82,0x55,0x90,0x8C,0x4B };
 	static uchar unknown7[] = {0xCB,0x8D,0xA4,0xE2,0x61,0xC2,
 		0xDD,0x27,0x39,0xEC,0x8A,0xCA,0xA6,0x98,0xF8,0x9B };
+#ifdef USE_RANDKEY
 	randkey( unknown6 );
 	randkey( unknown7 );
+#endif
 	put_byte( buf, 0x01 );
+#ifdef USE_RANDKEY
 	put_int( buf, rand2()  );
-//	put_int( buf, 0x0741E9748  );
+#else
+	put_int( buf, 0x71897D4C  );
+#endif
 	put_word( buf, sizeof(unknown6) );
 	put_data( buf, unknown6, sizeof(unknown6) );
 	put_byte( buf, 0x02 );
+#ifdef USE_RANDKEY
 	put_int( buf, rand2()  );
-//	put_int( buf, 0x8BED382E  );
+#else
+	put_int( buf, 0xF8854F31  );
+#endif
 	put_word( buf, sizeof(unknown7) );
 	put_data( buf, unknown7, sizeof(unknown7) );
-	buf->pos += 0x015C;	//395 zeros?  348
+	buf->pos += 328;	//all zeros
 	
 	DEL( verify_data );
 	post_packet( qq, p, RANDOM_KEY );
@@ -330,7 +352,7 @@ void prot_login_get_info( struct qqclient* qq )
 	qqpacket* p = packetmgr_new_send( qq, QQ_CMD_LOGIN_GET_INFO );
 	if( !p ) return;
 	bytebuffer *buf = p->buf;
-	put_word( buf, 0x010D );	//length or sth..
+	put_word( buf, 0x010E );	//length or sth..
 	put_byte( buf, 0x00 );
 	put_word( buf, 0x0101 );
 	put_data( buf, qq->data.locale, sizeof(qq->data.locale) );
@@ -344,6 +366,7 @@ void prot_login_get_info( struct qqclient* qq )
 	put_word( buf, qq->data.login_info_data.len );
 	put_data( buf, qq->data.login_info_data.data, qq->data.login_info_data.len );
 	put_word( buf, 0x0000 );
+	put_byte( buf, 0x01 );
 	put_int( buf, 0x00000000 );
 	memcpy( p->key, qq->data.login_info_key1, sizeof(qq->data.login_info_key1) );
 	post_packet( qq, p, RANDOM_KEY );
@@ -360,14 +383,18 @@ void prot_login_get_info_reply( struct qqclient* qq, qqpacket* p )
 	qq->server_time = get_int( buf );
 	qq->client_ip = get_int( buf );
 	get_int( buf );	//00000000
+	get_int( buf );	//00000000
 	get_token( buf, &qq->data.login_info_large );
+	/*
 	get_int( buf );	//????
 	uchar len = get_byte( buf );
 	get_data( buf, (void*)qq->self->nickname, len );
 	qq->self->nickname[len] = 0;
 	DBG("Hello, %s", qq->self->nickname );
 //	prot_login_a4( qq );
-	prot_login_get_list( qq, 0 );
+	*/
+	prot_login_send_info( qq );
+//	prot_login_get_list( qq, 0 );
 }
 
 void prot_login_a4( struct qqclient* qq )
@@ -397,75 +424,13 @@ void prot_login_a4_reply( struct qqclient* qq, qqpacket* p )
 	prot_login_get_list( qq, 0 );
 }
 
-void prot_login_get_list( struct qqclient* qq, ushort pos )
-{
-	qqpacket* p = packetmgr_new_send( qq, QQ_CMD_LOGIN_GET_LIST );
-	if( !p ) return;
-	bytebuffer *buf = p->buf;
-	put_word( buf, 0x011A );
-	put_word( buf, 0x0001 );
-	put_data( buf, qq->data.locale, sizeof(qq->data.locale) );
-	put_data( buf, qq->data.version_spec, sizeof(qq->data.version_spec) );
-	put_word( buf, qq->data.token_c.len );
-	put_data( buf, qq->data.token_c.data, qq->data.token_c.len );
-	put_int( buf, qq->data.login_info_unknown2 );
-	put_int( buf, qq->server_time );
-	put_int( buf, qq->client_ip );
-	put_int( buf, 00000000 );
-	put_word( buf, qq->data.login_info_large.len );
-	put_data( buf, qq->data.login_info_large.data, qq->data.login_info_large.len );
-	put_word( buf, pos );
-	put_word( buf, 0x0000 );
-	put_word( buf, 0x0071 );
-	buf->pos += 0x0071;	//0x0071 zeros
-	memcpy( p->key, qq->data.login_info_key1, sizeof(qq->data.login_info_key1) );
-	post_packet( qq, p, RANDOM_KEY );
-}
-
-void prot_login_get_list_reply( struct qqclient* qq, qqpacket* p )
-{
-	bytebuffer *buf = p->buf;
-	ushort next_pos, len;
-	len = get_word( buf );	//00 9C
-	get_int( buf );	//00 00 00 00
-	next_pos = get_word( buf );
-	if( next_pos > 0x0000 ){
-		//Well, i don't know how to judge whether we have got the whole list, so I just 
-		//tested the length.
-		DBG("next_pos = %d", next_pos );
-		if( len == 0x038A ){
-			prot_login_get_list( qq, ++ qq->data.login_list_count );
-		}
-	}else{
-		prot_login_send_info( qq );
-	}
-	while( buf->pos < buf->len-2 ){	//2zeros in the end
-		uint number = get_int( buf );
-		uchar type = get_byte( buf );
-		uchar gid = get_byte( buf );
-		if( type == 0x04 )	//if it is a qun
-		{
-#ifndef NO_QUN_INFO
-			qun_get( qq, number, 1 );
-#endif
-		}else if( type == 0x01 ){
-#ifndef NO_BUDDY_INFO
-			qqbuddy* b = buddy_get( qq, number, 1 );
-			if( b )
-				b->gid = gid / 4;
-#endif
-		}
-		number = type = gid = 0;
-	}
-}
-
 
 void prot_login_send_info( struct qqclient* qq )
 {
 	static uchar unknown5[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00, 
 		0x00,0x00,0x00 };
-	static uchar unknown6[] = {0xE9,0xC4,0xD6,0x5C,0x4D,0x9D,
-		0xA0,0x17,0xE5,0x24,0x6B,0x55,0x57,0xD3,0xAB,0xF1 };
+	static uchar unknown6[] = {0x92,0xA7,0xAC,0x76,0xD8,
+		0x13,0xCD,0x12,0x26,0xCD,0x31,0x82,0x55,0x90,0x8C,0x4B };
 	static uchar unknown7[] = {0xCB,0x8D,0xA4,0xE2,0x61,0xC2,
 		0xDD,0x27,0x39,0xEC,0x8A,0xCA,0xA6,0x98,0xF8,0x9B };
 		
@@ -473,14 +438,17 @@ void prot_login_send_info( struct qqclient* qq )
 	if( !p ) return;
 	bytebuffer *buf = p->buf;
 	//prepare sth.
+#ifdef USE_RANDKEY
 	randkey( unknown6 );
 	randkey( unknown7 );
+#endif
 	
 	put_word( buf, 0x0001 );
 	put_data( buf, qq->data.version_spec, sizeof(qq->data.version_spec) );
 	put_int( buf, qq->data.login_info_unknown2 );
 	put_int( buf, qq->server_time );
 	put_int( buf, qq->client_ip );
+	put_int( buf, 00000000 );
 	put_int( buf, 00000000 );
 	put_word( buf, qq->data.login_info_large.len );
 	put_data( buf, qq->data.login_info_large.data, qq->data.login_info_large.len );
@@ -494,23 +462,31 @@ void prot_login_send_info( struct qqclient* qq )
 	buf->pos += 16; //16 zeros
 	put_word( buf, qq->data.token_c.len );
 	put_data( buf, qq->data.token_c.data, qq->data.token_c.len );
-	put_int( buf, 0x00000007 );
+	put_int( buf, 0x00000008 );
 	put_int( buf, 0x00000000 );
-	put_int( buf, 0x08041801 );
+	put_int( buf, 0x08041000 );
+	put_byte( buf, 0x01 );
 	put_byte( buf, 0x40 );	//length of the following
 	put_byte( buf, 0x01 );
+#ifdef USE_RANDKEY
 	put_int( buf, rand2()  );
-//	put_int( buf, 0x0741E9748  );
+#else
+	put_int( buf, 0x71897D4C  );
+#endif
 	put_word( buf, sizeof(unknown6) );
 	put_data( buf, unknown6, sizeof(unknown6) );
 	put_data( buf, unknown5, sizeof(unknown5) );
 	put_data( buf, qq->data.server_data, sizeof(qq->data.server_data) );
+//	buf->pos += 15;
 	put_byte( buf, 0x02 );
+#ifdef USE_RANDKEY
 	put_int( buf, rand2()  );
-//	put_int( buf, 0x8BED382E  );
+#else
+	put_int( buf, 0xF8854F31  );
+#endif
 	put_word( buf, sizeof(unknown7) );
 	put_data( buf, unknown7, sizeof(unknown7) );
-	buf->pos += 249;	//all zeros
+	buf->pos += 251;	//all zeros
 	memcpy( p->key, qq->data.login_info_key1, sizeof(qq->data.login_info_key1) );
 	post_packet( qq, p, RANDOM_KEY );
 }
@@ -534,13 +510,14 @@ void prot_login_send_info_reply( struct qqclient* qq, qqpacket* p )
 	}
 	qq->client_ip = get_int( buf );
 	qq->client_port = get_word( buf );
-	qq->local_ip = get_int( buf );
-	qq->local_port = get_word( buf );
+//	qq->local_ip = get_int( buf );
+//	qq->local_port = get_word( buf );
 	qq->login_time = get_int( buf );
+	get_int( buf ); // 0x00000000
 	get_byte( buf );	//03
 	get_byte( buf );	//mode
-	buf->pos += 96;
-	qq->last_login_time = get_int( buf );
+//	buf->pos += 96;
+//	qq->last_login_time = get_int( buf );
 	//prepare IM key
 	uchar data[20];
 	*(uint*)data = htonl( qq->number );
@@ -552,25 +529,146 @@ void prot_login_send_info_reply( struct qqclient* qq, qqpacket* p )
 	md5_finish( &mst, (md5_byte_t*)qq->data.im_key );
 	//
 	time_t t;
-	t = CN_TIME( qq->last_login_time );
-	DBG("last login time: %s", ctime( &t ) );
+	t = CN_TIME( qq->login_time );
+	DBG("login time: %s", ctime( &t ) );
 	qqclient_set_process( qq, P_LOGIN );
 
-	//get information
-	prot_user_change_status( qq );
-	prot_user_get_level( qq );
-#ifndef NO_GROUP_INFO
-	group_update_list( qq );
-#endif
-#ifndef NO_BUDDY_INFO
-	buddy_update_list( qq );
-#endif
-#ifndef NO_QUN_INFO
-	qun_update_all( qq );
-#endif
-	qq->online_clock = 0;
+	prot_login_get_list( qq, 1 );
 }
 
+
+void prot_login_get_list( struct qqclient* qq, ushort pos )
+{
+	qqpacket* p = packetmgr_new_send( qq, QQ_CMD_LOGIN_GET_LIST );
+	if( !p ) return;
+	bytebuffer *buf = p->buf;
+	put_byte( buf, 1 );
+	put_int( buf, 0 );
+	put_int( buf, 0 );
+	put_word( buf, pos ); //index
+	post_packet( qq, p, SESSION_KEY );
+}
+
+void prot_login_get_list_reply( struct qqclient* qq, qqpacket* p )
+{
+	bytebuffer *buf = p->buf;
+	ushort current_page, total_pages, count;
+	uchar subcmd = get_byte( buf );	//01
+	int i;
+	uchar result = get_byte( buf ); //00
+	if( result == 00 ){
+		get_int( buf );
+		get_int( buf ); //00 00 07 E6
+		get_int( buf ); //4C A2 20 AE  Last Update Time
+		total_pages = get_word( buf );
+		current_page = get_word( buf );
+		count = get_word( buf );
+		for( i=0; i<count; i++ ){
+			uint number = get_int( buf );
+			uchar type = get_byte( buf );
+			uchar gid = get_byte( buf );
+			if( type == 0x04 )	//if it is a qun
+			{
+#ifndef NO_QUN_INFO
+				DBG("got qun: %d", number );
+				qun_get( qq, number, 1 );
+#endif
+			}else if( type == 0x01 ){
+#ifndef NO_BUDDY_INFO
+				qqbuddy* b = buddy_get( qq, number, 1 );
+				DBG("got buddy: %d", number );
+				if( b )
+					b->gid = gid / 4;
+#endif
+			}
+			number = type = gid = 0;
+		}
+		if( current_page < total_pages ){
+			prot_login_get_list( qq, 1 + current_page );
+			return;
+		}
+	}
+	subcmd = 0;
+	prot_login_e9( qq );
+}
+
+void prot_login_e9( struct qqclient* qq )
+{
+	qqpacket* p = packetmgr_new_send( qq, QQ_CMD_E9 );
+	if( !p ) return;
+	bytebuffer *buf = p->buf;
+	put_word( buf, 0x0101 );
+	post_packet( qq, p, SESSION_KEY );
+}
+
+
+void prot_login_e9_reply( struct qqclient* qq, qqpacket* p )
+{
+//	bytebuffer *buf = p->buf;
+	prot_login_ea( qq );
+}
+
+void prot_login_ea( struct qqclient* qq )
+{
+	qqpacket* p = packetmgr_new_send( qq, QQ_CMD_EA );
+	if( !p ) return;
+	bytebuffer *buf = p->buf;
+	put_byte( buf, 0x01 );
+	post_packet( qq, p, SESSION_KEY );
+}
+
+
+void prot_login_ea_reply( struct qqclient* qq, qqpacket* p )
+{
+//	bytebuffer *buf = p->buf;
+	prot_login_ed( qq );
+}
+
+
+void prot_login_ed( struct qqclient* qq )
+{
+	qqpacket* p = packetmgr_new_send( qq, QQ_CMD_ED );
+	if( !p ) return;
+	bytebuffer *buf = p->buf;
+	put_byte( buf, 0x01 );
+	post_packet( qq, p, SESSION_KEY );
+}
+
+
+void prot_login_ed_reply( struct qqclient* qq, qqpacket* p )
+{
+//	bytebuffer *buf = p->buf;
+	prot_login_ec( qq );
+}
+
+void prot_login_ec( struct qqclient* qq )
+{
+	qqpacket* p = packetmgr_new_send( qq, QQ_CMD_EC );
+	if( !p ) return;
+	bytebuffer *buf = p->buf;
+	put_byte( buf, 0x01 );
+	put_word( buf, 0x000A );
+	post_packet( qq, p, SESSION_KEY );
+}
+
+
+void prot_login_ec_reply( struct qqclient* qq, qqpacket* p )
+{
+//	bytebuffer *buf = p->buf;
+	//get information
+//#ifndef NO_GROUP_INFO
+	group_update_list( qq );
+	prot_user_get_level( qq );
+	prot_user_change_status( qq );
+//#endif
+//#ifndef NO_BUDDY_INFO
+	buddy_update_list( qq );
+//#endif
+//#ifndef NO_QUN_INFO
+	qun_update_all( qq );
+//#endif
+	qq->online_clock = 0;
+}
 
 void prot_login_logout( struct qqclient* qq )
 {

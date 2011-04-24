@@ -74,7 +74,8 @@ int qqclient_create( qqclient* qq, uint num, char* pass )
 
 static void delete_func(const void *p)
 {
-	DEL( p );
+	if(p)
+		DEL( p );
 }
 
 int qqclient_md5_create( qqclient* qq, uint num, uchar* md5_pass )
@@ -84,10 +85,18 @@ int qqclient_md5_create( qqclient* qq, uint num, uchar* md5_pass )
 	memset( qq, 0, sizeof( qqclient ) );
 	qq->number = num;
 	memcpy( qq->md5_pass1, md5_pass, 16 );
-	//
+	//make md5_pass2
 	md5_init( &mst );
 	md5_append( &mst, (md5_byte_t*)qq->md5_pass1, 16 );
 	md5_finish( &mst, (md5_byte_t*)qq->md5_pass2 );
+	//make md5_pass_qq for qq2011 or newer version
+	uchar source[24] = {0};
+	memcpy( source, qq->md5_pass1, 16 );
+	*(uint*)( &source[20] ) = htonl( qq->number );
+	md5_init( &mst );
+	md5_append( &mst, (md5_byte_t*)source, 24 );
+	md5_finish( &mst, (md5_byte_t*)qq->md5_pass_qq );
+	
 	qq->mode = QQ_ONLINE;
 	qq->process = P_INIT;
 	read_config( qq );
@@ -117,7 +126,7 @@ void qqclient_keepalive(qqclient* qq)
 		packetmgr_check_packet( qq, 5 );
 		if( qq->process == P_LOGIN ){
 			//1次心跳/分钟
-			if( counter % ( 1 *60*INTERVAL) == 0 ){
+			if( counter % ( 1 *30*INTERVAL) == 0 ){
 				prot_user_keep_alive( qq );
 			}
 #ifndef NO_BUDDY_INFO
@@ -168,6 +177,11 @@ int qqclient_login( qqclient* qq )
 	DBG("login");
 	int ret;
 	if( qq->process != P_INIT ){
+		if( qq->process == P_WAITING ){
+			qqclient_set_process( qq, P_LOGGING );
+			prot_login_verify( qq );
+			return 0;
+		}
 		DBG("please logout first");
 		return -1;
 	}
@@ -205,9 +219,9 @@ void qqclient_detach( qqclient* qq )
 	if( qq->process == P_INIT )
 		return;
 	if( qq->process == P_LOGIN ){
-		int i;
-		for( i = 0; i<4; i++ )
-			prot_login_logout( qq );
+	//	int i;
+	//	for( i = 0; i<4; i++ )
+	//		prot_login_logout( qq );
 	}else{
 		DBG("process = %d", qq->process );
 	}

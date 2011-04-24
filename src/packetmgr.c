@@ -92,6 +92,8 @@ void packetmgr_new_seqno( qqclient* qq )
 
 void packetmgr_del_packet( qqpacketmgr* mgr, qqpacket* p )
 {
+	if( NULL == p )
+		return;
 	if( p->match ){
 		loop_remove( &mgr->sent_loop, p->match );
 		delete_func( p->match );
@@ -203,6 +205,8 @@ int handle_packet( qqclient* qq, qqpacket* p, uchar* data, int len )
 	p->version = get_word( buf );
 	p->command = get_word( buf );
 	p->seqno = get_word( buf );
+	get_int( buf ); //number
+	buf->pos += 3; //00 00 00
 	uint chk_repeat = (p->seqno<<16)|p->command;
 	//check repeat
 	if( loop_search( &mgr->recv_loop, (void*)chk_repeat, repeat_searcher ) == NULL ){
@@ -355,8 +359,8 @@ int packetmgr_check_packet( struct qqclient* qq, int timeout )
 			loop_remove( &mgr->sent_loop, p );
 		}
 		if( p ){
-			if( p->send_times >= 10 ){
-				MSG("[%u] Failed to send the packet. command: %x\n", qq->number, p->command );
+			if( p->send_times >= 5 ){
+				DBG("[%u] Failed to send the packet. command: %x\n", qq->number, p->command );
 				if( p->command == QQ_CMD_SEND_IM ){
 					buddy_msg_callback( qq, 10000, time(NULL), "刚才某条消息发送失败。" );
 				}

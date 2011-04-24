@@ -116,40 +116,44 @@ enum VERIFY_MODE{
 };
 
 enum QQ_CMD{
-	QQ_CMD_TOUCH = 			0x0091,
-	QQ_CMD_LOGOUT = 		0x0062,	
+	QQ_CMD_TOUCH = 				0x0091,
+	QQ_CMD_LOGOUT = 			0x0062,	
 	QQ_CMD_LOGIN_REQUEST  = 	0x00ba,
 	QQ_CMD_LOGIN_GET_INFO = 	0x00e5,	
-	QQ_CMD_LOGIN_A4 = 		0x00a4,
-	QQ_CMD_LOGIN_GET_LIST = 	0x0018,
+	QQ_CMD_LOGIN_A4 = 			0x00a4,
+	QQ_CMD_LOGIN_GET_LIST = 	0x00eb,
 	QQ_CMD_LOGIN_SEND_INFO = 	0x0030,
 	QQ_CMD_KEEP_ALIVE = 		0x0058,
 	QQ_CMD_GET_USER_INFO = 		0x0006,
 	QQ_CMD_CHANGE_STATUS = 		0x000d,
-	QQ_CMD_SEND_IM = 		0x00cd,
-	QQ_CMD_RECV_IM = 		0x0017,
+	QQ_CMD_SEND_IM = 			0x00cd,
+	QQ_CMD_RECV_IM = 			0x0017,
 	QQ_CMD_RECV_IM_09 = 		0x00ce,
-	QQ_CMD_GET_KEY = 		0x001d,
+	QQ_CMD_GET_KEY = 			0x001d,
 	QQ_CMD_GET_BUDDY_LIST = 	0x0126,
 	QQ_CMD_GET_BUDDY_ONLINE = 	0x0027,
-	QQ_CMD_QUN_CMD = 		0x0002,
+	QQ_CMD_QUN_CMD = 			0x0002,
 	QQ_CMD_BUDDY_INFO = 		0x003c,
 	QQ_CMD_BUDDY_ALIAS = 		0x003e,
 	QQ_CMD_GROUP_LABEL = 		0x0001,
-	QQ_CMD_GET_LEVEL = 		0x005C,
+	QQ_CMD_GET_LEVEL = 			0x005C,
 	QQ_CMD_GET_BUDDY_EXTRA_INFO = 	0x0065,
 	QQ_CMD_GET_BUDDY_SIGN = 	0x0067,
-	QQ_CMD_BROADCAST = 		0x0080,
+	QQ_CMD_BROADCAST = 			0x0080,
 	QQ_CMD_BUDDY_STATUS = 		0x0081,
 	QQ_CMD_ADDBUDDY_REQUEST = 	0x00A7,
 	QQ_CMD_ADDBUDDY_VERIFY = 	0x00A8,
 	QQ_CMD_ADDBUDDY_QUESTION = 	0x00B7,
-	QQ_CMD_ACCOUNT = 		0x00b5,
+	QQ_CMD_ACCOUNT = 			0x00b5,
 	QQ_CMD_GET_NOTICE = 		0x00d4,
-	QQ_CMD_CHECK_IP = 		0x00da,
+	QQ_CMD_CHECK_IP = 			0x00da,
 	QQ_CMD_LOGIN_VERIFY = 		0x00dd,
 	QQ_CMD_REQUEST_TOKEN = 		0x00ae,
-	QQ_CMD_DEL_BUDDY = 		0x000a
+	QQ_CMD_DEL_BUDDY = 			0x000a,
+	QQ_CMD_E9 = 				0x00e9,
+	QQ_CMD_EA = 				0x00ea,
+	QQ_CMD_EC = 				0x00ec,
+	QQ_CMD_ED = 				0x00ed,
 };
 
 struct qqclient;
@@ -168,6 +172,14 @@ void prot_login_send_info_reply( struct qqclient* qq, qqpacket* p );
 void prot_login_logout( struct qqclient* qq );
 void prot_login_a4( struct qqclient* qq );
 void prot_login_a4_reply( struct qqclient* qq, qqpacket* p );
+void prot_login_e9( struct qqclient* qq );
+void prot_login_e9_reply( struct qqclient* qq, qqpacket* p );
+void prot_login_ea( struct qqclient* qq );
+void prot_login_ea_reply( struct qqclient* qq, qqpacket* p );
+void prot_login_ed( struct qqclient* qq );
+void prot_login_ed_reply( struct qqclient* qq, qqpacket* p );
+void prot_login_ec( struct qqclient* qq );
+void prot_login_ec_reply( struct qqclient* qq, qqpacket* p );
 void prot_login_get_list( struct qqclient* qq, ushort pos );
 void prot_login_get_list_reply( struct qqclient* qq, qqpacket* p );
 //prot_misc.c

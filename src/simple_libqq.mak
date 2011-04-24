@@ -1,7 +1,7 @@
 # Makefile for LibQQ
 
 CC=		gcc
-CFLAGS=		-c -Wall -s -Werror -DNO_QUN_INFO -DNO_BUDDY_DETAIL_INFO -DNO_BUDDY_INFO -DNO_GROUP_INFO#
+CFLAGS=		-c -Wall -s -Werror -DLOGIN_WAIT -DNO_QUN_INFO -DNO_BUDDY_DETAIL_INFO #-DNO_BUDDY_INFO -DNO_GROUP_INFO
 LDFLAGS=	-lpthreadGC2 -lws2_32 -shared -I"../lib/pthread" -L"../lib/pthread"
 LD=		gcc
 

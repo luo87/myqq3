@@ -75,7 +75,7 @@ EXPORT qqclient* libqq_create( uint number, char* pass )
 		return NULL;
 	}
 	qqclient_create( qq, number, pass );
-	qq->auto_accept = 1;	//temporarily do this
+	qq->auto_accept = 0;	//temporarily do this
 	return qq;
 }
 
@@ -92,7 +92,7 @@ EXPORT int libqq_login( qqclient* qq )
 
 EXPORT int libqq_keepalive( qqclient* qq )
 {
-	qqclient_keepalive( qq );
+	//qqclient_keepalive( qq );
 	return 0;
 }
 

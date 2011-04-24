@@ -283,7 +283,7 @@ static void process_sys_im( struct qqclient* qq, qqpacket* p, qqmessage* msg )
 	}else{
 		qqclient_set_process( qq, P_ERROR );
 	}
-//	DBG("sysim(type:%x): %s", content_type, msg->msg_content );
+	DBG("sysim(type:%x): %s", content_type, msg->msg_content );
 }
 
 static void process_qun_im( struct qqclient* qq, qqpacket* p, qqmessage* msg )

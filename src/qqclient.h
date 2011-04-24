@@ -20,7 +20,8 @@ enum LOGIN_PROCESS{
 	P_ERROR,
 	P_DENIED,
 	P_WRONGPASS,
-	P_BUSY
+	P_BUSY,
+	P_WAITING
 };
 
 
@@ -37,6 +38,7 @@ typedef struct qqclient{
 	char		password[64];
 	uchar		md5_pass1[16];
 	uchar		md5_pass2[16];
+	uchar		md5_pass_qq[16];
 	uint		server_ip;
 	ushort		server_port;
 	uint		proxy_server_ip;

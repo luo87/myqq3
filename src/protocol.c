@@ -34,7 +34,7 @@
 int post_packet( struct qqclient* qq, qqpacket* p, int key_type )
 {
 	bytebuffer* buf = p->buf;
-	int head_len = qq->network==TCP || qq->network==PROXY_HTTP ? 13 : 11;
+	int head_len = qq->network==TCP || qq->network==PROXY_HTTP ? 24 : 22;
 	if( qq->log_packet ){
 		DBG("[%d] send packet cmd: %x  seq: %x", qq->number, p->command, p->seqno );
 		hex_dump( buf->data, buf->pos );
@@ -114,6 +114,8 @@ int post_packet( struct qqclient* qq, qqpacket* p, int key_type )
 	put_word( buf, p->command );
 	put_word( buf, p->seqno );
 	put_int( buf, qq->number );
+	static uchar unknown_packet_flags[] = {0x02,0x00,0x00,0x00,0x01,0x01,0x01,0x00,0x00,0x64,0x70};
+	put_data( buf, unknown_packet_flags, 11 );
 	p->key_type = key_type;
 	return packetmgr_put( qq, p );
 }
@@ -121,7 +123,7 @@ int post_packet( struct qqclient* qq, qqpacket* p, int key_type )
 static int decrypt_with_key( qqclient* qq, qqpacket* p, bytebuffer* buf, uchar* key )
 {
 	int out_len = PACKET_SIZE;
-	int head_len = qq->network==TCP || qq->network==PROXY_HTTP ? 9 : 7;
+	int head_len = qq->network==TCP || qq->network==PROXY_HTTP ? 16 : 14;
 	uchar* decrypted;
 	NEW( decrypted, PACKET_SIZE );
 	if( !decrypted ) {
@@ -147,7 +149,7 @@ static int decrypt_with_key( qqclient* qq, qqpacket* p, bytebuffer* buf, uchar* 
 static int decrypt_packet( qqclient* qq, qqpacket* p, bytebuffer* buf )
 {
 	//size2+head1+version2+command2+sequence2 = 9
-	int head_len = qq->network==TCP || qq->network==PROXY_HTTP ? 9 : 7;
+	int head_len = qq->network==TCP || qq->network==PROXY_HTTP ? 16 : 14;
 	if( p->match ){
 		switch( p->match->key_type ){
 		case NO_KEY:
@@ -221,6 +223,18 @@ int process_packet( qqclient* qq, qqpacket* p, bytebuffer* buf )
 	case QQ_CMD_LOGIN_SEND_INFO:
 		prot_login_send_info_reply( qq, p );
 		break;
+	case QQ_CMD_E9:
+		prot_login_e9_reply( qq, p );
+		break; 
+	case QQ_CMD_EA:
+		prot_login_ea_reply( qq, p );
+		break; 
+	case QQ_CMD_EC:
+		prot_login_ec_reply( qq, p );
+		break; 
+	case QQ_CMD_ED:
+		prot_login_ed_reply( qq, p );
+		break; 
 	case QQ_CMD_KEEP_ALIVE:
 		prot_user_keep_alive_reply( qq, p );
 		break;
