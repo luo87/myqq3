@@ -28,6 +28,10 @@ MacOSX编译：
 
 Update History:
 
+Version 3.30(2011-04)
+1. Update to qq2011beta2 Protocol.
+2. See SVN Changes.
+
 Version 3.21(2010-06)
 1. 修正了一些东西。
 
